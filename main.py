@@ -127,7 +127,8 @@ def coletar_dados_das_paginas(uf, pagina_inicial, pagina_final):
 
 # Lista de UFs e número de páginas
 ufs_paginas = {
-    'AL': 636,
+    #'AL': 636,
+    'RJ': 7124,
     'AM': 611,
     'AP': 101,
     'BA': 2852,
@@ -144,7 +145,6 @@ ufs_paginas = {
     'PE': 2151,
     'PI': 604,
     'PR': 3435,
-    'RJ': 7124,
     'RN': 739,
     'RS': 3756,
     'RO': 371,

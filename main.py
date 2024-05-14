@@ -13,7 +13,7 @@ options.add_argument('--disable-blink-features=AutomationControlled')
 options.add_argument('user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36')
 driver = webdriver.Chrome(options=options)
 
-def preencher_formulario():
+def preencher_formulario(uf):
     driver.get("https://portal.cfm.org.br/busca-medicos/")
     
     try:
@@ -35,6 +35,13 @@ def preencher_formulario():
         ))
         tipo_inscricao.select_by_value('P')
         print("Tipo de inscrição 'Principal' selecionado.")
+        
+        # Selecionar UF
+        uf_select = Select(WebDriverWait(driver, 20).until(
+            EC.presence_of_element_located((By.NAME, 'uf'))
+        ))
+        uf_select.select_by_value(uf)
+        print(f"UF {uf} selecionada.")
 
         # Scroll para o botão para garantir que está visível
         botao_pesquisar = WebDriverWait(driver, 20).until(
@@ -88,13 +95,13 @@ def fechar_aviso_lgpd():
     except Exception as e:
         print(f"Nenhum aviso LGPD encontrado ou erro ao fechar: {e}")
 
-def coletar_dados_das_paginas(pagina_inicial, pagina_final):
+def coletar_dados_das_paginas(uf, pagina_inicial, pagina_final):
     csv_data = []
     
     for pagina in range(pagina_inicial, pagina_final + 1):
         print(f"Raspando página {pagina}")
         if pagina == pagina_inicial:
-            preencher_formulario()
+            preencher_formulario(uf)
         else:
             try:
                 fechar_aviso_lgpd()
@@ -118,19 +125,47 @@ def coletar_dados_das_paginas(pagina_inicial, pagina_final):
     
     return csv_data
 
-# Defina as páginas a serem raspadas
-pagina_inicial = 1
-pagina_final = 60155
+# Lista de UFs e número de páginas
+ufs_paginas = {
+    'AL': 636,
+    'AM': 611,
+    'AP': 101,
+    'BA': 2852,
+    'CE': 1869,
+    'DF': 1627,
+    'ES': 1269,
+    'GO': 1807,
+    'MA': 764,
+    'MG': 6601,
+    'MT': 776,
+    'MS': 727,
+    'PA': 1061,
+    'PB': 959,
+    'PE': 2151,
+    'PI': 604,
+    'PR': 3435,
+    'RJ': 7124,
+    'RN': 739,
+    'RS': 3756,
+    'RO': 371,
+    'RR': 115,
+    'SC': 2152,
+    'SP': 17064,
+    'SE': 519,
+    'TO': 349,
+}
 
 try:
-    dados_medicos = coletar_dados_das_paginas(pagina_inicial, pagina_final)
-    if dados_medicos:
-        # Converter para DataFrame e salvar em CSV
-        df = pd.DataFrame(dados_medicos)
-        df.to_csv('todosprofissionais.csv', index=False, encoding='utf-8-sig')
-        print("Raspagem completa. Dados salvos em todosprofissionais.csv")
-    else:
-        print("Nenhum dado foi raspado.")
+    for uf, paginas in ufs_paginas.items():
+        print(f"Iniciando raspagem para UF {uf} com {paginas} páginas.")
+        dados_medicos = coletar_dados_das_paginas(uf, 1, paginas)
+        if dados_medicos:
+            # Converter para DataFrame e salvar em CSV
+            df = pd.DataFrame(dados_medicos)
+            df.to_csv(f'profissionais_{uf}.csv', index=False, encoding='utf-8-sig')
+            print(f"Raspagem completa para UF {uf}. Dados salvos em profissionais_{uf}.csv")
+        else:
+            print(f"Nenhum dado foi raspado para UF {uf}.")
 except Exception as e:
     print(f"Erro crítico: {e}")
 finally:

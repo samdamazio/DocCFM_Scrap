@@ -5,6 +5,7 @@ from selenium.webdriver.support import expected_conditions as EC
 import pandas as pd
 import time
 import random
+from termcolor import colored
 
 # Configurações do Selenium
 options = webdriver.ChromeOptions()
@@ -97,62 +98,69 @@ def fechar_aviso_lgpd():
 
 def coletar_dados_das_paginas(uf, pagina_inicial, pagina_final):
     csv_data = []
+    retries = 3  # Número de tentativas em caso de erro
     
     for pagina in range(pagina_inicial, pagina_final + 1):
-        print(f"Raspando página {pagina}")
-        if pagina == pagina_inicial:
-            preencher_formulario(uf)
-        else:
+        success = False
+        for attempt in range(retries):
             try:
-                fechar_aviso_lgpd()
-                next_button = WebDriverWait(driver, 20).until(
-                    EC.element_to_be_clickable((By.XPATH, f"//li[@class='paginationjs-page J-paginationjs-page' and @data-num='{pagina}']/a"))
+                print(f"Raspando página {pagina} da UF {uf}, tentativa {attempt + 1}")
+                if pagina == pagina_inicial:
+                    preencher_formulario(uf)
+                else:
+                    fechar_aviso_lgpd()
+                    next_button = WebDriverWait(driver, 20).until(
+                        EC.element_to_be_clickable((By.XPATH, f"//li[@class='paginationjs-page J-paginationjs-page' and @data-num='{pagina}']/a"))
+                    )
+                    driver.execute_script("arguments[0].scrollIntoView();", next_button)
+                    next_button.click()
+                    time.sleep(random.uniform(5, 10))  # Aguarda o carregamento da nova página
+
+                WebDriverWait(driver, 20).until(
+                    EC.presence_of_element_located((By.CLASS_NAME, 'resultado-item'))
                 )
-                driver.execute_script("arguments[0].scrollIntoView();", next_button)
-                next_button.click()
-                time.sleep(random.uniform(5, 10))  # Aguarda o carregamento da nova página
-            except Exception as e:
-                print(f"Erro ao navegar para a próxima página: {e}")
+                csv_data.extend(exportar_cards_para_csv())
+                print(colored(f"Sucesso na raspagem da página {pagina} da UF {uf}", 'green'))
+                success = True
                 break
-        
-        try:
-            WebDriverWait(driver, 20).until(
-                EC.presence_of_element_located((By.CLASS_NAME, 'resultado-item'))
-            )
-            csv_data.extend(exportar_cards_para_csv())
-        except Exception as e:
-            print(f"Erro ao carregar resultados na página {pagina}: {e}")
+            except Exception as e:
+                print(colored(f"Erro ao carregar resultados na página {pagina} da UF {uf}: {e}", 'red'))
+                time.sleep(5)  # Espera antes de tentar novamente
+
+        if not success:
+            print(colored(f"Falha na raspagem da página {pagina} da UF {uf} após {retries} tentativas.", 'red'))
+            break
     
     return csv_data
 
 # Lista de UFs e número de páginas
 ufs_paginas = {
     #'AL': 636,
-    'RJ': 7124,
-    'AM': 611,
-    'AP': 101,
-    'BA': 2852,
-    'CE': 1869,
-    'DF': 1627,
-    'ES': 1269,
-    'GO': 1807,
-    'MA': 764,
-    'MG': 6601,
-    'MT': 776,
-    'MS': 727,
-    'PA': 1061,
-    'PB': 959,
-    'PE': 2151,
-    'PI': 604,
-    'PR': 3435,
-    'RN': 739,
-    'RS': 3756,
-    'RO': 371,
-    'RR': 115,
-    'SC': 2152,
+    #'RJ': 7124,
+    #'AM': 611,
+    #'AP': 101,
+    #'BA': 2852,
+    #'CE': 1869,
+    #'DF': 1627,
+    #'ES': 1269,
+    #'GO': 1807,
+    #'MA': 764,
+    #'MG': 6601,
+    #'MT': 776,
+    #'MS': 727,
+    #'PA': 1061,
+    #'PB': 959,
+    #'PE': 2151,
+    #'PI': 604,
+    #'PR': 3435,
+    #'RN': 739,
+    #'RS': 3756,
+    #'RO': 371,
+    #'RR': 115,
+    #'SC': 2152,
     'SP': 17064,
-    'SE': 519,
-    'TO': 349,
+    #'SE': 519,
+    #'TO': 349,
 }
 
 try:

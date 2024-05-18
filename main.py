@@ -113,10 +113,17 @@ def coletar_dados_das_paginas(uf, pagina_inicial, pagina_final):
                         EC.element_to_be_clickable((By.XPATH, f"//li[@class='paginationjs-page J-paginationjs-page' and @data-num='{pagina}']/a"))
                     )
                     driver.execute_script("arguments[0].scrollIntoView();", next_button)
-                    next_button.click()
-                    time.sleep(random.uniform(5, 10))  # Aguarda o carregamento da nova página
+                    
+                    # Esperar até que o iframe do reCAPTCHA desapareça
+                    WebDriverWait(driver, 20).until(
+                        EC.invisibility_of_element((By.XPATH, "//iframe[contains(@title, 'desafio reCAPTCHA')]"))
+                    )
+                    
+                    # Clicar no botão usando JavaScript
+                    driver.execute_script("arguments[0].click();", next_button)
+                    time.sleep(random.uniform(10, 15))  # Aumentar o tempo de espera para garantir o carregamento da nova página
 
-                WebDriverWait(driver, 20).until(
+                WebDriverWait(driver, 30).until(  # Aumentar o tempo de espera
                     EC.presence_of_element_located((By.CLASS_NAME, 'resultado-item'))
                 )
                 csv_data.extend(exportar_cards_para_csv())

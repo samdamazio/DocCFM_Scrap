@@ -1,0 +1,61 @@
+Erro ao carregar resultados na página 1331 da UF SP: Message: 
+Stacktrace:
+        GetHandleVerifier [0x00007FF6C70522C2+60002]
+        (No symbol) [0x00007FF6C6FCCA59]
+        (No symbol) [0x00007FF6C6E87EDA]
+        (No symbol) [0x00007FF6C6ED76E6]
+        (No symbol) [0x00007FF6C6ED77AC]
+        (No symbol) [0x00007FF6C6F1E9D7]
+        (No symbol) [0x00007FF6C6EFC2CF]
+        (No symbol) [0x00007FF6C6F1BCC7]
+        (No symbol) [0x00007FF6C6EFC033]
+        (No symbol) [0x00007FF6C6EC9657]
+        (No symbol) [0x00007FF6C6ECA251]
+        GetHandleVerifier [0x00007FF6C7363E2D+3278285]
+        GetHandleVerifier [0x00007FF6C73B0190+3590448]
+        GetHandleVerifier [0x00007FF6C73A61D0+3549552]
+        GetHandleVerifier [0x00007FF6C7101DE6+779654]
+        (No symbol) [0x00007FF6C6FD7ACF]
+        (No symbol) [0x00007FF6C6FD2EE4]
+        (No symbol) [0x00007FF6C6FD3072]
+        (No symbol) [0x00007FF6C6FC2C4F]
+        BaseThreadInitThunk [0x00007FFC47E4257D+29]
+        RtlUserThreadStart [0x00007FFC4922AA48+40]
+
+Raspando página 1331 da UF SP, tentativa 3
+Aviso LGPD fechado.
+[0517/235417.419:INFO:CONSOLE(0)] "Third-party cookie will be blocked. Learn more in the Issues tab.", source: https://portal.cfm.org.br/busca-medicos/ (0)
+[0517/235417.419:INFO:CONSOLE(0)] "Third-party cookie will be blocked. Learn more in the Issues tab.", source: https://portal.cfm.org.br/busca-medicos/ (0)
+[0517/235417.523:INFO:CONSOLE(0)] "Third-party cookie will be blocked. Learn more in the Issues tab.", source: https://portal.cfm.org.br/busca-medicos/ (0)
+Erro ao carregar resultados na página 1331 da UF SP: Message: 
+Stacktrace:
+        GetHandleVerifier [0x00007FF6C70522C2+60002]
+        (No symbol) [0x00007FF6C6FCCA59]
+        (No symbol) [0x00007FF6C6E87EDA]
+        (No symbol) [0x00007FF6C6ED76E6]
+        (No symbol) [0x00007FF6C6ED77AC]
+        (No symbol) [0x00007FF6C6F1E9D7]
+        (No symbol) [0x00007FF6C6EFC2CF]
+        (No symbol) [0x00007FF6C6F1BCC7]
+        (No symbol) [0x00007FF6C6EFC033]
+        (No symbol) [0x00007FF6C6EC9657]
+        (No symbol) [0x00007FF6C6ECA251]
+        GetHandleVerifier [0x00007FF6C7363E2D+3278285]
+        GetHandleVerifier [0x00007FF6C73B0190+3590448]
+        GetHandleVerifier [0x00007FF6C73A61D0+3549552]
+        GetHandleVerifier [0x00007FF6C7101DE6+779654]
+        (No symbol) [0x00007FF6C6FD7ACF]
+        (No symbol) [0x00007FF6C6FD2EE4]
+        (No symbol) [0x00007FF6C6FD3072]
+        (No symbol) [0x00007FF6C6FC2C4F]
+        BaseThreadInitThunk [0x00007FFC47E4257D+29]
+        RtlUserThreadStart [0x00007FFC4922AA48+40]
+
+Falha na raspagem da página 1331 da UF SP após 3 tentativas.
+contiunuo tendo 
+
+Nesta versão:
+
+1-Aumentamos o tempo de espera para garantir que a página e os resultados carreguem completamente.
+2-Usamos JavaScript para clicar no botão de navegação, o que pode evitar o problema de "element click intercepted".
+3-Esperamos explicitamente que o iframe do reCAPTCHA desapareça antes de tentar clicar no botão.

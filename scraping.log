@@ -1,9 +1,0 @@
-2024-05-14 20:16:40,057 - INFO - Raspando página 1
-2024-05-14 20:16:41,332 - ERROR - Erro ao obter a página 1: 404 Client Error: Not Found for url: https://portal.cfm.org.br/busca-medicos/
-2024-05-14 20:16:41,333 - WARNING - Nenhum dado foi raspado.
-2024-05-14 20:16:47,846 - INFO - Raspando página 1
-2024-05-14 20:16:49,127 - ERROR - Erro ao obter a página 1: 404 Client Error: Not Found for url: https://portal.cfm.org.br/busca-medicos/
-2024-05-14 20:16:49,128 - WARNING - Nenhum dado foi raspado.
-2024-05-14 20:18:23,179 - INFO - Raspando página 1
-2024-05-14 20:18:24,448 - ERROR - Erro ao obter a página 1: 404 Client Error: Not Found for url: https://portal.cfm.org.br/busca-medicos/
-2024-05-14 20:18:24,449 - WARNING - Nenhum dado foi raspado.

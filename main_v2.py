@@ -4,6 +4,9 @@ import pandas as pd
 import time
 import random
 from termcolor import colored
+# Remova:
+# import requests
+# API_2CAPTCHA_KEY = "SUA_API_KEY_AQUI"  # Substitua pela sua chave de API do 2Captcha
 
 def log(msg, color="white"):
     print(colored(msg, color))
@@ -84,26 +87,34 @@ def ir_para_pagina(driver, pagina):
 def coletar_dados_das_paginas(uf, pagina_inicial, pagina_final, driver):
     dados = []
     try:
-        preencher_formulario(driver, uf)
-        log("Aguardando resultados...", "yellow")
-        time.sleep(2)
-        html = driver.page_source
-        with open(f"debug_{uf}_pagina1.html", "w", encoding="utf-8") as f:
-            f.write(html)
-        log("HTML da página salvo para debug.", "magenta")
-        WebDriverWait(driver, 60).until(
-            EC.visibility_of_element_located((By.CLASS_NAME, 'resultado-item'))
-        )
-        for pagina in range(pagina_inicial, pagina_final + 1):
+        tentativas_pagina1 = 0
+        while tentativas_pagina1 < 3:
+            try:
+                preencher_formulario(driver, uf)
+                log("Aguardando resultados...", "yellow")
+                WebDriverWait(driver, 60).until(
+                    EC.visibility_of_element_located((By.CLASS_NAME, 'resultado-item'))
+                )
+                log(f"Resultados carregados para a página 1 da UF {uf}", "green")
+                dados.extend(exportar_cards_para_csv(driver))
+                break
+            except Exception as e:
+                tentativas_pagina1 += 1
+                log(f"Erro ao carregar resultados na página 1 da UF {uf}, tentativa {tentativas_pagina1}: {e}", "red")
+                time.sleep(5)
+        else:
+            log(f"Falha ao carregar resultados na página 1 da UF {uf} após 3 tentativas.", "red")
+            return dados
+
+        for pagina in range(pagina_inicial + 1, pagina_final + 1):
             tentativas = 0
             while tentativas < 3:
                 try:
-                    if pagina > 1:
-                        fechar_aviso_lgpd(driver)
-                        ir_para_pagina(driver, pagina)
-                        WebDriverWait(driver, 30).until(
-                            EC.presence_of_element_located((By.CLASS_NAME, 'resultado-item'))
-                        )
+                    fechar_aviso_lgpd(driver)
+                    ir_para_pagina(driver, pagina)
+                    WebDriverWait(driver, 30).until(
+                        EC.presence_of_element_located((By.CLASS_NAME, 'resultado-item'))
+                    )
                     log(f"Raspando página {pagina} da UF {uf}", "white")
                     dados.extend(exportar_cards_para_csv(driver))
                     log(f"Sucesso na raspagem da página {pagina} da UF {uf}", "green")
@@ -111,7 +122,7 @@ def coletar_dados_das_paginas(uf, pagina_inicial, pagina_final, driver):
                 except Exception as e:
                     tentativas += 1
                     log(f"Erro na página {pagina} da UF {uf}, tentativa {tentativas}: {e}", "red")
-                    time.sleep(2)
+                    time.sleep(5)
             else:
                 log(f"Falha na raspagem da página {pagina} da UF {uf} após 3 tentativas.", "red")
                 break
@@ -127,7 +138,7 @@ def raspagem_uf(uf, paginas):
     from selenium.webdriver.support import expected_conditions as EC
 
     options = webdriver.ChromeOptions()
-    options.add_argument('--headless')
+    # options.add_argument('--headless')  # Rode com interface gráfica
     options.add_argument('--disable-blink-features=AutomationControlled')
     options.add_argument('user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36')
     options.binary_location = "/usr/bin/chromium-browser"
@@ -156,11 +167,34 @@ if __name__ == "__main__":
     from selenium.webdriver.support import expected_conditions as EC
 
     ufs_paginas = {
-        'AC': 5,  # Use valores menores para teste rápido
-        'AL': 5,
-        'AM': 5,
-        # Adicione mais UFs conforme desejar
-    }
+    'AC': 146, 
+    'AL': 684,
+    'AM': 643,
+    #'AP': 109,
+    #'BA': 3078,
+    #'CE': 1976,
+    #'DF': 1720,
+    #'ES': 1348,
+    #'GO': 1975,
+    #'MA': 826,
+    #'MG': 7004,
+    #'MT': 831,
+    #'MS': 768,
+    #'PA': 1128,
+    #'PB': 1039,
+    #'PE': 2301,
+    #'PI': 658,
+    #'PR': 3717,
+    #'RJ': 7429,
+    #'RN': 788,
+    #'RS': 3895,
+    #'RO': 410,
+    #'RR': 121,
+    #'SC': 2318,
+    #'SP': 17897,
+    #'SE': 550,
+    #'TO': 379,
+}
 
     max_processes = 3
     pool = multiprocessing.Pool(processes=max_processes)

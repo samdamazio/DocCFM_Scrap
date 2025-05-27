@@ -96,7 +96,13 @@ def coletar_dados_das_paginas(uf, pagina_inicial, pagina_final, driver):
                     EC.visibility_of_element_located((By.CLASS_NAME, 'resultado-item'))
                 )
                 log(f"Resultados carregados para a página 1 da UF {uf}", "green")
-                dados.extend(exportar_cards_para_csv(driver))
+                page_data = exportar_cards_para_csv(driver)
+                if not page_data:
+                    tentativas_pagina1 += 1
+                    log(f"Nenhum dado extraído na página 1 da UF {uf}, tentativa {tentativas_pagina1}. Tentando novamente...", "yellow")
+                    time.sleep(5)
+                    continue
+                dados.extend(page_data)
                 break
             except Exception as e:
                 tentativas_pagina1 += 1
@@ -104,7 +110,9 @@ def coletar_dados_das_paginas(uf, pagina_inicial, pagina_final, driver):
                 time.sleep(5)
         else:
             log(f"Falha ao carregar resultados na página 1 da UF {uf} após 3 tentativas.", "red")
-            return dados
+            log("Se aparecer um captcha, resolva manualmente no navegador. Aguardando 60 segundos antes de tentar novamente...", "yellow")
+            time.sleep(60)
+            return coletar_dados_das_paginas(uf, pagina_inicial, pagina_final, driver)
 
         for pagina in range(pagina_inicial + 1, pagina_final + 1):
             tentativas = 0
@@ -116,7 +124,13 @@ def coletar_dados_das_paginas(uf, pagina_inicial, pagina_final, driver):
                         EC.presence_of_element_located((By.CLASS_NAME, 'resultado-item'))
                     )
                     log(f"Raspando página {pagina} da UF {uf}", "white")
-                    dados.extend(exportar_cards_para_csv(driver))
+                    page_data = exportar_cards_para_csv(driver)
+                    if not page_data:
+                        tentativas += 1
+                        log(f"Nenhum dado extraído na página {pagina} da UF {uf}, tentativa {tentativas}. Tentando novamente...", "yellow")
+                        time.sleep(5)
+                        continue
+                    dados.extend(page_data)
                     log(f"Sucesso na raspagem da página {pagina} da UF {uf}", "green")
                     break
                 except Exception as e:
@@ -125,7 +139,11 @@ def coletar_dados_das_paginas(uf, pagina_inicial, pagina_final, driver):
                     time.sleep(5)
             else:
                 log(f"Falha na raspagem da página {pagina} da UF {uf} após 3 tentativas.", "red")
-                break
+                log(f"Se aparecer um captcha, resolva manualmente no navegador. Aguardando 60 segundos antes de tentar novamente a página {pagina}...", "yellow")
+                time.sleep(60)
+                # Tenta novamente a mesma página após o captcha ser resolvido
+                pagina -= 1
+                continue
     except Exception as e:
         log(f"Erro crítico durante a raspagem da UF {uf}: {e}", "red")
     return dados
@@ -167,10 +185,10 @@ if __name__ == "__main__":
     from selenium.webdriver.support import expected_conditions as EC
 
     ufs_paginas = {
-    'AC': 146, 
-    'AL': 684,
+    # 'AC': 170, # 146, 
+    #'AL': 684,
     'AM': 643,
-    #'AP': 109,
+    # 'AP': 109,
     #'BA': 3078,
     #'CE': 1976,
     #'DF': 1720,
@@ -188,15 +206,15 @@ if __name__ == "__main__":
     #'RJ': 7429,
     #'RN': 788,
     #'RS': 3895,
-    #'RO': 410,
-    #'RR': 121,
+    'RO': 410,
+    'RR': 121,
     #'SC': 2318,
     #'SP': 17897,
-    #'SE': 550,
-    #'TO': 379,
+    # 'SE': 550,
+    'TO': 379,
 }
 
-    max_processes = 3
+    max_processes = 4
     pool = multiprocessing.Pool(processes=max_processes)
     args = [(uf, paginas) for uf, paginas in ufs_paginas.items()]
 

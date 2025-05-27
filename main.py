@@ -142,7 +142,7 @@ def coletar_dados_das_paginas(uf, pagina_inicial, pagina_final):
 
 # Lista de UFs e número de páginas
 ufs_paginas = {
-    #'AC' = 146, 
+    #'AC': 146, 
     #'AL': 684,
     #'AM': 643,
     #'AP': 109,

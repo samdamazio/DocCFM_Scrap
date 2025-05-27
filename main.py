@@ -1,4 +1,5 @@
 from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select, WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -11,8 +12,11 @@ from termcolor import colored
 options = webdriver.ChromeOptions()
 options.add_argument('--headless')  # Executar o Chrome em modo headless (sem interface gráfica)
 options.add_argument('--disable-blink-features=AutomationControlled')
-options.add_argument('user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36')
-driver = webdriver.Chrome(options=options)
+options.add_argument('user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36') # User-Agent para evitar bloqueios
+options.binary_location = "/usr/bin/chromium-browser"  # Localização do Chromium
+
+service = Service("/snap/bin/chromium.chromedriver")
+driver = webdriver.Chrome(service=service, options=options)
 
 def preencher_formulario(uf):
     driver.get("https://portal.cfm.org.br/busca-medicos/")
@@ -142,9 +146,9 @@ def coletar_dados_das_paginas(uf, pagina_inicial, pagina_final):
 
 # Lista de UFs e número de páginas
 ufs_paginas = {
-    #'AC': 146, 
-    #'AL': 684,
-    #'AM': 643,
+    'AC': 146, 
+    'AL': 684,
+    'AM': 643,
     #'AP': 109,
     #'BA': 3078,
     #'CE': 1976,
